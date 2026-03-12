@@ -45,7 +45,7 @@ export default function Footer() {
 
   return (
     <footer ref={footerRef} className="bg-black border-t border-white/10 py-16 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-black to-gray-900 opacity-50" />
+      <div className="absolute inset-0 bg-linear-to-br from-black via-black to-gray-900 opacity-50" />
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">

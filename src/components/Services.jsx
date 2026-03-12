@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import ServicePanel from './ServicePanel'
 
 const services = [
   {
@@ -7,9 +8,7 @@ const services = [
     sub: 'Ask me about ML projects',
     icon: (
       <svg className="h-12 w-12 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path d="M4 4h16v12H4z" />
-        <path d="M8 20h8" />
-        <path d="M10 16h4" />
+        <path d="M4 4h16v12H4z" /><path d="M8 20h8" /><path d="M10 16h4" />
       </svg>
     ),
   },
@@ -19,8 +18,7 @@ const services = [
     sub: 'Inquire about LLM development',
     icon: (
       <svg className="h-12 w-12 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path d="M4 20h16M4 4l7.5 7.5" />
-        <path d="M14.5 12.5l5 5" />
+        <path d="M4 20h16M4 4l7.5 7.5" /><path d="M14.5 12.5l5 5" />
       </svg>
     ),
   },
@@ -39,6 +37,7 @@ const services = [
 
 export default function Services() {
   const [visible, setVisible] = useState(false)
+  const [selectedService, setSelectedService] = useState(null)
   const sectionRef = useRef(null)
 
   useEffect(() => {
@@ -51,41 +50,56 @@ export default function Services() {
   }, [])
 
   return (
-    <section id="services" ref={sectionRef} className="bg-black text-white py-16 px-6">
-      <div className="max-w-6xl mx-auto">
+    <>
+      <section id="services" ref={sectionRef} className="bg-black text-white py-16 px-6">
+        <div className="max-w-6xl mx-auto">
 
-        {/* Header */}
-        <div className={`mb-12 text-center transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          <h2 className="text-4xl font-extrabold mb-4">Services</h2>
-          <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-            From training deep learning models to deploying full-stack AI systems — I build end-to-end
-            solutions that work in production, not just in notebooks.
-          </p>
-          <button className="mt-6 px-6 py-2 bg-white text-black font-semibold rounded-lg shadow hover:bg-gray-200 transition duration-300">
-            Start Your Project
-          </button>
-        </div>
-
-        {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {services.map((service, i) => (
-            <div
-              key={service.title}
-              className={`bg-white/5 border border-white/10 backdrop-blur-md p-6 rounded-xl hover:shadow-xl transition-all duration-500 group ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-              }`}
-              style={{ transitionDelay: `${i * 150}ms` }}
+          {/* Header */}
+          <div className={`mb-12 text-center transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <h2 className="text-4xl font-extrabold mb-4">Services</h2>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+              From training deep learning models to deploying full-stack AI systems — I build end-to-end
+              solutions that work in production, not just in notebooks.
+            </p>
+            <a
+              href="mailto:igntayyab@gmail.com"
+              className="mt-6 inline-block px-6 py-2 bg-white text-black font-semibold rounded-lg shadow hover:bg-gray-200 transition duration-300"
             >
-              <div className="mb-4">{service.icon}</div>
-              <h3 className="text-xl font-bold mb-2">{service.title}</h3>
-              <p className="text-gray-400 mb-4">{service.desc}</p>
-              <div className="text-sm text-gray-300">{service.sub}</div>
-              <a href="#" className="text-blue-400 mt-4 inline-block hover:underline">Read more →</a>
-            </div>
-          ))}
-        </div>
+              Start Your Project
+            </a>
+          </div>
 
-      </div>
-    </section>
+          {/* Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {services.map((service, i) => (
+              <div
+                key={service.title}
+                className={`bg-white/5 border border-white/10 backdrop-blur-md p-6 rounded-xl hover:shadow-xl hover:border-white/20 transition-all duration-500 group flex flex-col ${
+                  visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                }`}
+                style={{ transitionDelay: `${i * 150}ms` }}
+              >
+                <div className="mb-4">{service.icon}</div>
+                <h3 className="text-xl font-bold mb-2">{service.title}</h3>
+                <p className="text-gray-400 mb-4 flex-1">{service.desc}</p>
+                <div className="text-sm text-gray-500 mb-4">{service.sub}</div>
+                <button
+                  onClick={() => setSelectedService(service)}
+                  className="text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all duration-200 w-fit"
+                >
+                  Read more <span className="transition-transform duration-200">→</span>
+                </button>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      <ServicePanel
+        service={selectedService}
+        onClose={() => setSelectedService(null)}
+      />
+    </>
   )
 }
