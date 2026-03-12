@@ -165,7 +165,7 @@ export default function ServicePanel({ service, onClose }) {
   if (!open || !data) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex">
+    <div className="fixed inset-0 z-100 flex">
       {/* Backdrop */}
       <div
         className={`absolute inset-0 bg-black/75 backdrop-blur-sm transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}
