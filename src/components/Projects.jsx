@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 const projects = [
   {
@@ -45,10 +45,52 @@ const projects = [
   },
 ]
 
+// Lazy image component — only loads when near viewport
+function LazyImage({ src, alt }) {
+  const [loaded, setLoaded] = useState(false)
+  const [inView, setInView] = useState(false)
+  const imgRef = useRef(null)
+ 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '200px' } // start loading 200px before entering viewport
+    )
+    if (imgRef.current) observer.observe(imgRef.current)
+    return () => observer.disconnect()
+  }, [])
+ 
+  return (
+    <div ref={imgRef} className="w-full h-full">
+      {/* Skeleton shimmer shown until image loads */}
+      {!loaded && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+      )}
+      {inView && (
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setLoaded(true)}
+          className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
+            loaded ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      )}
+    </div>
+  )
+}
+ 
 export default function Projects() {
   const [visible, setVisible] = useState(false)
   const sectionRef = useRef(null)
-
+ 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setVisible(true) },
@@ -57,14 +99,14 @@ export default function Projects() {
     if (sectionRef.current) observer.observe(sectionRef.current)
     return () => observer.disconnect()
   }, [])
-
-  const handleClick = (url) => {
-    window.open(url, '_blank')
-  }
-
+ 
+  const handleClick = useCallback((url) => {
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }, [])
+ 
   return (
     <section id="projects" ref={sectionRef} className="px-6 pb-24 pt-12 bg-white">
-
+ 
       {/* Header */}
       <div className={`text-center mb-20 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <h2 className="text-5xl font-black text-black mb-6 tracking-tight">Featured Work</h2>
@@ -73,26 +115,22 @@ export default function Projects() {
           style={{ width: visible ? '80px' : '0px' }}
         />
       </div>
-
+ 
       {/* Grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {projects.map((project, i) => (
           <div
-            key={project.id + i}
+            key={project.id}
             onClick={() => handleClick(project.url)}
             className={`group cursor-pointer transition-all duration-500 hover:-translate-y-1 ${
               visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
             style={{ transitionDelay: `${i * 100}ms` }}
           >
-            <div className="relative overflow-hidden bg-gray-50 border border-black/10 rounded-lg aspect-[4/3] hover:border-black/30 transition-all duration-300">
-              <img
-                src={project.img}
-                alt={project.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
+            <div className="relative overflow-hidden bg-gray-100 border border-black/10 rounded-lg aspect-4/3 hover:border-black/30 transition-all duration-300">
+              <LazyImage src={project.img} alt={project.title} />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="absolute bottom-0 left-0 right-0 p-6 bg-linearZ-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <h3 className="text-white text-xl font-bold mb-1">{project.title}</h3>
                 <p className="text-white/80 text-sm">{project.tech}</p>
               </div>
@@ -100,7 +138,7 @@ export default function Projects() {
           </div>
         ))}
       </div>
-
+ 
     </section>
   )
 }
